@@ -34,30 +34,30 @@ from pprint import pprint
 import sys
 from urlparse import urlparse
 
-from commerceModules import commerce_setup_helper 
-from commerceModules import load_user_metadata
-from commerceModules.configurators import create_atg_server_layers
-from commerceModules.configurators import otd_config
-from commerceModules.configurators import weblogic_create_datasources    
-from commerceModules.configurators import weblogic_create_machine
-from commerceModules.configurators import weblogic_create_managed_server
-from commerceModules.configurators import weblogic_domain_config
-from commerceModules.configurators import weblogic_domain_settings
-from commerceModules.configurators import weblogic_install_managed_server
-from commerceModules.configurators import weblogic_packer
-from commerceModules.installers import advanced_storage_helper
-from commerceModules.installers import atg_helper
-from commerceModules.installers import atgpatch_helper
-from commerceModules.installers import cas_helper
-from commerceModules.installers import copy_ssh_keys_helper
-from commerceModules.installers import java_helper
-from commerceModules.installers import mdex_helper
-from commerceModules.installers import oracle_rdbms_helper
-from commerceModules.installers import otd_helper
-from commerceModules.installers import platform_helper
-from commerceModules.installers import storage_helper
-from commerceModules.installers import tools_helper
-from commerceModules.installers import weblogic_helper
+from oc_provision_wrappers import commerce_setup_helper 
+from oc_provision_wrappers import load_user_metadata
+from oc_provision_wrappers.atg import create_atg_server_layers 
+from oc_provision_wrappers.atg.v11_1 import atg_helper, atgpatch_postinstall
+from oc_provision_wrappers.atg.v11_1 import atgpatch_helper
+from oc_provision_wrappers.database.v11g import oracle_rdbms_install
+from oc_provision_wrappers.endeca.v11_1 import cas_helper
+from oc_provision_wrappers.endeca.v11_1 import mdex_helper
+from oc_provision_wrappers.endeca.v11_1 import platform_helper
+from oc_provision_wrappers.endeca.v11_1 import tools_helper
+from oc_provision_wrappers.java import java_helper
+from oc_provision_wrappers.otd.v11_1 import otd_config
+from oc_provision_wrappers.otd.v11_1 import otd_helper
+from oc_provision_wrappers.sshkeys import copy_ssh_keys_helper
+from oc_provision_wrappers.storage import advanced_storage_helper
+from oc_provision_wrappers.storage import storage_helper
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_create_datasources    
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_create_machine
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_create_managed_server
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_domain_config
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_domain_settings
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_helper
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_install_managed_server
+from oc_provision_wrappers.wls.v12_1_2 import weblogic_packer
 
 
 sys.path.insert(0, os.path.abspath(".."))
@@ -236,7 +236,10 @@ if install_atg:
     create_atg_server_layers.generate_atg_server_payers(configData, full_path)
     
 if install_atgpatch:
-    atgpatch_helper.install_atgpatch(configData, full_path)          
+    success = atgpatch_helper.install_atgpatch(configData, full_path)
+    # fix issues in the patch
+    if (success):
+        atgpatch_postinstall.post_install_cmds(configData, full_path)  
             
 if install_mdex:
     mdex_helper.install_mdex(configData, full_path)
@@ -254,7 +257,7 @@ if install_otd:
     otd_helper.install_otd(configData, full_path)      
 
 if config_otd:
-    otd_config.config_otd(configData, full_path)         
+    otd_config.config_otd(configData, full_path)      
 
 if install_oracle_db:
-    oracle_rdbms_helper.install_oracle(configData, full_path)        
+    oracle_rdbms_install.install_oracle(configData, full_path)        

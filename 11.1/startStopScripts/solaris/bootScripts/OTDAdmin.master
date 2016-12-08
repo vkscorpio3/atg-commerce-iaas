@@ -58,7 +58,7 @@ start() {
             echo
             exit
         fi
-        echo -n $"Starting $SERVICE_NAME ... "
+        echo "Starting $SERVICE_NAME ... "
 
         ${COMMAND_PREFIX} "$PROGRAM_START > /dev/null 2>&1 &"
  
@@ -97,8 +97,8 @@ stopproc() {
         echo "${SERVICE_NAME} is not running"
     else
 
-        echo -n $"Stopping $SERVICE_NAME ... "
-        echo -n "(pid $OLDPID) "
+        echo "Stopping $SERVICE_NAME ... "
+        echo "(pid $OLDPID) "
 
         # The process was found, try and kill it nicely
         ${COMMAND_PREFIX} "${PROGRAM_STOP} > /dev/null 2>&1 &"
@@ -109,7 +109,7 @@ stopproc() {
         sleep=0
         # Loop to see if the process is still active
         while [ $sleep -lt 120 -a $RETVAL -eq 1 ]; do
-            echo -n -e "\nwaiting for processes to stop";
+            echo "\nwaiting for processes to stop";
             sleep 10
             sleep=`expr $sleep + 10`
             OLDPID=`/usr/ucb/ps auxwww | grep $PROCESS_STRING | grep -v grep | awk '{print $2}'`
